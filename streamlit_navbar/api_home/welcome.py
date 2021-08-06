@@ -1,5 +1,6 @@
 import streamlit as st
 import cv2
+import os
 
 def welcome():
     st.title('Home')
@@ -10,3 +11,4 @@ def welcome():
         st.image(default_img)
     except:
         pass
+    os.makedirs('../streamlit_xgb_storage', exist_ok=True)

@@ -1,0 +1,14 @@
+Streamlit xgboost demo
+
+模块设计与功能
+
+数据eda与建模数据集保存：选择原始csv文件，选出备用的列，指定target列与pos/neg，保存。（保存用到的列与target列名，pos值）
+
+特征eda：离散特征 woe，ks；连续特征 hist，分箱方式（eqsize、qcut）、分箱后新特征。
+（load建模数据集，保存分箱的列与分箱方式、cutoff，保存分箱后新特征）
+
+建模：xgboost参数设置（包括train/val拆分），选择数据集与特征化结果，建模，train/val AUC、KS、分数分布，feature importance，tree规则举例可视化，模型保存。
+（load特征eda的json中数据特征化方法，加入model的eval指标）
+
+模型预测：模型选择，待测数据选择，load模型+特征化方法，直接输出结果，画出分数分布，与model训练时的分数分布进行对比。
+
