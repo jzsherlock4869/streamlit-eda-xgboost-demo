@@ -32,8 +32,12 @@ def load_raw_data():
         feature_names = list(df.keys())
         if 'Unnamed: 0' in feature_names:
             feature_names.remove('Unnamed: 0')
-        sel_cols = st.sidebar.multiselect(label='select columns to be used', options=feature_names,\
-            default=feature_names[:5])
+        if st.sidebar.button('Use all features'):
+            sel_cols = st.sidebar.multiselect(label='select columns to be used', options=feature_names,\
+                default=feature_names)
+        else:
+            sel_cols = st.sidebar.multiselect(label='select columns to be used', options=feature_names,\
+                default=feature_names[5:])
         st.sidebar.write("Total {} cols selected for analysis".format(len(sel_cols)))
 
         # select target column and label to be predicted
