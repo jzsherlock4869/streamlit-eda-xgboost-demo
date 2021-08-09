@@ -1,8 +1,12 @@
 import streamlit as st
 import cv2
+import sys
+
 from api_home.welcome import welcome
 from api_home.server_status import show_server_status
 from api_eda.data_analysis import load_raw_data
+from api_manage.dataset_manager import dataset_main
+from api_feature.feature_engine import feature_main
 
 def navigation():
     try:
@@ -17,17 +21,14 @@ if navigation() == "home":
     show_server_status()
 
 elif navigation() == "manage":
-    if st.sidebar.button('hi'):
-        st.write('hi')
-    if st.sidebar.button('bye'):
-        st.write('bye')
-    # TODO: dataset and task management
+    # TODO: task management
+    dataset_main()
 
 elif navigation() == "eda":
     load_raw_data()
 
 elif navigation() == "feature":
-    st.title('Feature Analysis & Engineering')
+    feature_main()
     for item in range(5):
         st.write(f'TO BE CONT\'D {item}')
 

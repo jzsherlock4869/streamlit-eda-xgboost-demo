@@ -8,6 +8,9 @@ import json
 from functools import partial
 import traceback
 from copy import copy
+from datetime import datetime
+
+from api_manage.dataset_manager import dataset_update
 
 def color_positive_highlight(pos, night, val):
     if night:
@@ -25,6 +28,8 @@ def load_raw_data():
         # load raw data
         n_rows = st.sidebar.slider('num of rows to show', min_value=100, max_value=5000, value=200, step=100)
         df = pd.read_csv(filepath)
+        print(df.head())
+        df.head()
         st.sidebar.write('show row number '+ str(n_rows))
         df = df[:n_rows]
         st.title('Raw Data Table')
@@ -32,7 +37,7 @@ def load_raw_data():
         feature_names = list(df.keys())
         if 'Unnamed: 0' in feature_names:
             feature_names.remove('Unnamed: 0')
-        if st.sidebar.button('Use all features'):
+        if st.sidebar.checkbox('Use all features'):
             sel_cols = st.sidebar.multiselect(label='select columns to be used', options=feature_names,\
                 default=feature_names)
         else:
@@ -43,7 +48,7 @@ def load_raw_data():
         # select target column and label to be predicted
         sel_target = st.sidebar.selectbox(
             'Select the target column',
-            sel_cols,
+            sel_cols[::-1],
             )
         pos_neg = list(df[sel_target].unique())
         pos_label = st.sidebar.selectbox(
@@ -57,25 +62,30 @@ def load_raw_data():
 
         # save to storage as a new dataset
         dataset_name = st.text_input('dataset name: ', value='')
+        exist_dataset_names = dataset_update()
         if st.button('Save the dataset'):
-            if dataset_name:
+            if dataset_name and dataset_name not in exist_dataset_names:
                 save_csv_path = os.path.join('../streamlit_xgb_storage', 'datasets', dataset_name)
                 os.makedirs(save_csv_path, exist_ok=True)
-                df[sel_cols].to_csv(os.path.join(save_csv_path, 'data.csv'), index=False)
+                df[sel_cols].to_csv(os.path.join(save_csv_path, 'data.csv'), index=False, header=True)
                 feat_cols = copy(sel_cols)
                 feat_cols.remove(sel_target)
                 dataset_info = {
+                                'dataset_name': dataset_name,
                                 'raw_path': filepath, 
                                 'target_col': sel_target,
                                 'features_used': '|'.join(feat_cols),
-                                'pos_label': str(pos_label)
+                                'pos_label': str(pos_label),
+                                'created_time': str(datetime.now())
                                 }
                 # print(dataset_info)
                 with open(os.path.join(save_csv_path, 'info.json'), 'w') as f_json:
                     json.dump(dataset_info, f_json, indent=4)
                 st.write('Dataset {} saved ~'.format(dataset_name))
             else:
-                st.write('Please assign a dataset name !')
+                st.write('Please assign a valid dataset name !')
+                st.write('current dataset names : ')
+                st.write(', '.join(exist_dataset_names))
         
     except Exception as ex:
         traceback.print_exc()
